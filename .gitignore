@@ -50,8 +50,7 @@ coverage/
 *.log
 *.tmp
 
-# User-generated screenshots/artifacts (development)
+# User-generated screenshots (development only)
 builderhub.png
-artifacts/
 opencodetmp/
 social-media-app/

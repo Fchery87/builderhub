@@ -299,14 +299,14 @@ export function TaskForm({
               <div className="space-y-2">
                 <Label htmlFor="assignee">Assignee</Label>
                 <Select
-                  value={formData.assignee_id || ""}
-                  onValueChange={(value) => handleInputChange("assignee_id", value)}
+                  value={formData.assignee_id || "unassigned"}
+                  onValueChange={(value) => handleInputChange("assignee_id", value === "unassigned" ? "" : value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Unassigned" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Unassigned</SelectItem>
+                    <SelectItem value="unassigned">Unassigned</SelectItem>
                     {users.map((user) => (
                       <SelectItem key={user.id} value={user.id}>
                         <div className="flex items-center gap-2">

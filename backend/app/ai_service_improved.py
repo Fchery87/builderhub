@@ -4,18 +4,21 @@ import httpx
 import logging
 import asyncio
 from typing import Dict, Any, Optional
-from google.generativeai import GenerativeModel, GenerativeModelType
+import google.generativeai as genai
+from google.generativeai import GenerativeModel
 
 class AIService:
     def __init__(self):
         self.api_key = os.getenv("GEMINI_API_KEY")
+        # Configure the API globally
+        if self.api_key:
+            genai.configure(api_key=self.api_key)
+
         self.flash_model = GenerativeModel(
-            model_name="gemini-2.0-flash-exp",
-            api_key=self.api_key
+            model_name="gemini-2.0-flash"
         )
         self.pro_model = GenerativeModel(
-            model_name="gemini-2.0-pro-exp",
-            api_key=self.api_key
+            model_name="gemini-2.0-pro"
         )
         self.timeout = httpx.Timeout(10.0, connect=5.0)  # 10s total, 5s connect
         self.max_retries = 3

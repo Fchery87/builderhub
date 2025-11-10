@@ -48,8 +48,8 @@ class AIService:
         genai.configure(api_key=self.api_key)
         
         # Initialize models
-        self.flash_model = genai.GenerativeModel('gemini-2.0-flash-exp')
-        self.pro_model = genai.GenerativeModel('gemini-2.0-pro-exp')
+        self.flash_model = genai.GenerativeModel('gemini-2.0-flash')
+        self.pro_model = genai.GenerativeModel('gemini-2.0-pro')
     
     @rate_limit(max_calls=10, time_window=60)  # 10 calls per minute
     async def generate_acceptance_criteria(self, task_description: str, task_title: str) -> Dict[str, Any]:

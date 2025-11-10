@@ -4,28 +4,30 @@ import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/dashboard-layout";
 import { DashboardOverview } from "@/components/dashboard-overview";
 import { ProjectList } from "@/components/project-list";
+import { ProjectForm } from "@/components/project-form";
 import { TaskList } from "@/components/task-list";
 import { TaskBoard } from "@/components/task-board";
 import { TaskForm } from "@/components/task-form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { useProjects } from "@/hooks/useProjects";
 
-// Mock data for development - this will be replaced with InstantDB integration
-const mockProjects = [
+// Mock data fallback for development
+const mockProjectsFallback = [
   {
     id: "1",
     name: "Website Redesign",
     description: "Complete overhaul of the company website with modern design and improved UX",
     owner_id: "user1",
-    created_at: Date.now() - 86400000 * 7, // 7 days ago
+    created_at: Date.now() - 86400000 * 7,
     task_count: 12
   },
   {
-    id: "2", 
+    id: "2",
     name: "Mobile App Development",
     description: "Native mobile application for iOS and Android platforms",
     owner_id: "user1",
-    created_at: Date.now() - 86400000 * 14, // 14 days ago
+    created_at: Date.now() - 86400000 * 14,
     task_count: 8
   },
   {
@@ -33,12 +35,12 @@ const mockProjects = [
     name: "API Integration",
     description: "Integration with third-party payment and analytics APIs",
     owner_id: "user1",
-    created_at: Date.now() - 86400000 * 3, // 3 days ago
+    created_at: Date.now() - 86400000 * 3,
     task_count: 5
   }
 ];
 
-const mockTasks = [
+const mockTasksFallback = [
   {
     id: "1",
     project_id: "1",
@@ -77,7 +79,7 @@ const mockTasks = [
   }
 ];
 
-const mockStats = {
+const mockStatsFallback = {
   totalTasks: 25,
   completedTasks: 10,
   inProgressTasks: 8,
@@ -88,36 +90,151 @@ const mockStats = {
       id: "1",
       type: "task_completed" as const,
       description: "Completed wireframes for homepage",
-      timestamp: Date.now() - 3600000 * 2 // 2 hours ago
+      timestamp: Date.now() - 3600000 * 2
     },
     {
       id: "2",
       type: "task_updated" as const,
       description: "Updated responsive navigation task",
-      timestamp: Date.now() - 3600000 * 5 // 5 hours ago
+      timestamp: Date.now() - 3600000 * 5
     },
     {
       id: "3",
       type: "task_created" as const,
       description: "Created new task for API integration",
-      timestamp: Date.now() - 3600000 * 24 // 1 day ago
+      timestamp: Date.now() - 3600000 * 24
     }
   ]
 };
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [projects, setProjects] = useState(mockProjects);
-  const [tasks, setTasks] = useState(mockTasks);
+  const [tasks, setTasks] = useState(mockTasksFallback);
+  const [stats, setStats] = useState(mockStatsFallback);
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [showTaskForm, setShowTaskForm] = useState(false);
+  const [showProjectForm, setShowProjectForm] = useState(false);
   const [editingTask, setEditingTask] = useState<any>(null);
+  const [editingProject, setEditingProject] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+  const {
+    projects,
+    loading: projectsLoading,
+    createProject,
+    updateProject,
+    deleteProject,
+    refetch: refetchProjects
+  } = useProjects();
+
+  // Fetch data from backend API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        // Fetch projects
+        const projectsResponse = await fetch("/api/projects");
+        const projectsData = projectsResponse.ok ? await projectsResponse.json() : mockProjectsFallback;
+        setProjects(projectsData || mockProjectsFallback);
+
+        // Fetch tasks
+        const tasksResponse = await fetch("/api/tasks");
+        const tasksData = tasksResponse.ok ? await tasksResponse.json() : mockTasksFallback;
+        setTasks(tasksData || mockTasksFallback);
+
+        // Calculate stats
+        const allTasks = tasksData || mockTasksFallback;
+        const calculatedStats = {
+          totalTasks: allTasks.length,
+          completedTasks: allTasks.filter((t: any) => t.status === "done").length,
+          inProgressTasks: allTasks.filter((t: any) => t.status === "in_progress").length,
+          todoTasks: allTasks.filter((t: any) => t.status === "todo").length,
+          totalProjects: (projectsData || mockProjectsFallback).length,
+          recentActivity: mockStatsFallback.recentActivity
+        };
+        setStats(calculatedStats);
+      } catch (err) {
+        console.error("Failed to fetch data:", err);
+        setError("Failed to load data. Using demo data.");
+        // Use fallback data on error
+        setProjects(mockProjectsFallback);
+        setTasks(mockTasksFallback);
+        setStats(mockStatsFallback);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleCreateProject = () => {
-    // This will open a modal or navigate to a create project page
-    console.log("Create project clicked");
+    setEditingProject(null);
+    setShowProjectForm(true);
+  };
+
+  const handleEditProject = (projectId: string) => {
+    const project = projects.find(p => p.id === projectId);
+    if (project) {
+      setEditingProject(project);
+      setShowProjectForm(true);
+    }
+  };
+
+  const handleProjectSubmit = async (projectData: { name: string; description: string }) => {
+    try {
+      if (editingProject) {
+        await updateProject(editingProject.id, projectData.name, projectData.description);
+        toast({
+          title: 'Project updated',
+          description: `${projectData.name} has been updated successfully.`,
+        });
+      } else {
+        await createProject(projectData.name, projectData.description);
+        toast({
+          title: 'Project created',
+          description: `${projectData.name} has been created successfully.`,
+        });
+      }
+      setShowProjectForm(false);
+      await refetchProjects();
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to save project',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleProjectCancel = () => {
+    setShowProjectForm(false);
+    setEditingProject(null);
+  };
+
+  const handleDeleteProject = async (projectId: string) => {
+    const project = projects.find(p => p.id === projectId);
+    if (!project) return;
+
+    if (confirm(`Are you sure you want to delete "${project.name}"? This action cannot be undone.`)) {
+      try {
+        await deleteProject(projectId);
+        toast({
+          title: 'Project deleted',
+          description: `${project.name} has been deleted successfully.`,
+        });
+        await refetchProjects();
+      } catch (error) {
+        toast({
+          title: 'Error',
+          description: error instanceof Error ? error.message : 'Failed to delete project',
+          variant: 'destructive',
+        });
+      }
+    }
   };
 
   const handleCreateTask = () => {
@@ -180,7 +297,11 @@ export default function DashboardPage() {
         }
       }
     } catch (error) {
-      console.error("Failed to save task:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save task. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -215,20 +336,14 @@ export default function DashboardPage() {
         ? `"${updatedTask.title}" moved to ${newStatus.replace("_", " ")}`
         : "Task status updated.",
     });
-    console.log(`Updated task ${taskId} to status ${newStatus}`);
   };
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 800);
-    return () => clearTimeout(timer);
-  }, []);
 
   const renderContent = () => {
     switch (activeTab) {
       case "dashboard":
         return (
           <DashboardOverview
-            stats={mockStats}
+            stats={stats}
             onViewTasks={getViewTasks}
             onViewProjects={getViewProjects}
             isLoading={isLoading}
@@ -240,6 +355,8 @@ export default function DashboardPage() {
             projects={projects}
             onCreateProject={handleCreateProject}
             onSelectProject={handleSelectProject}
+            onEditProject={handleEditProject}
+            onDeleteProject={handleDeleteProject}
             isLoading={isLoading}
           />
         );
@@ -296,6 +413,23 @@ export default function DashboardPage() {
     >
       {renderContent()}
       
+      {/* Project Form Modal */}
+      <Dialog open={showProjectForm} onOpenChange={setShowProjectForm}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              {editingProject ? "Edit Project" : "Create New Project"}
+            </DialogTitle>
+          </DialogHeader>
+          <ProjectForm
+            initialData={editingProject}
+            onSubmit={handleProjectSubmit}
+            onCancel={handleProjectCancel}
+            isLoading={projectsLoading}
+          />
+        </DialogContent>
+      </Dialog>
+
       {/* Task Form Modal */}
       <Dialog open={showTaskForm} onOpenChange={setShowTaskForm}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">

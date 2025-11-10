@@ -2,24 +2,33 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import os
+import logging
 from dotenv import load_dotenv
+
+# Load environment variables BEFORE importing app modules
+load_dotenv()
+
 from app.database import db_service
-from app.routers import auth, tasks, ai
+from app.routers import auth, tasks, ai, projects
 from app.performance import performance_monitor, PerformanceMiddleware
 from app.rate_limiter import RateLimitMiddleware, ai_rate_limiter, extract_user_key
 
-# Load environment variables
-load_dotenv()
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
-    print("Task Board API starting up...")
+    logger.info("Task Board API starting up...")
     # Initialize database schema
     await db_service.init_schema()
     yield
     # Shutdown
-    print("Task Board API shutting down...")
+    logger.info("Task Board API shutting down...")
 
 app = FastAPI(
     title="Task Board API",
@@ -51,6 +60,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(tasks.router)
 app.include_router(ai.router)
+app.include_router(projects.router)
 
 @app.get("/")
 async def root():
@@ -73,4 +83,4 @@ async def reset_performance_stats():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8001)

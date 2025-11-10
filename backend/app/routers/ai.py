@@ -168,8 +168,8 @@ async def ai_health_check():
                 "status": "healthy",
                 "service": "ai_service",
                 "models": {
-                    "flash": "gemini-2.0-flash-exp",
-                    "pro": "gemini-2.0-pro-exp"
+                    "flash": "gemini-2.0-flash",
+                    "pro": "gemini-2.0-pro"
                 },
                 "last_test": test_result.get("timestamp")
             }

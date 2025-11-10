@@ -29,7 +29,6 @@ export async function GET(
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Error fetching task:', error);
     return NextResponse.json(
       { error: 'Failed to fetch task' },
       { status: 500 }
@@ -74,7 +73,6 @@ export async function PUT(
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Error updating task:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to update task' },
       { status: 500 }
@@ -116,7 +114,6 @@ export async function DELETE(
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Error deleting task:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to delete task' },
       { status: 500 }

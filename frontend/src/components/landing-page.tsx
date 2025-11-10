@@ -83,10 +83,10 @@ export function LandingPage() {
           </div>
           <div className="flex items-center gap-4">
             <ThemeToggle />
-            <Link href="/dashboard">
+            <Link href="/auth/login">
               <Button variant="outline" size="sm">
                 <LogIn className="mr-2 h-4 w-4" />
-                Dashboard
+                Sign In
               </Button>
             </Link>
           </div>
@@ -114,14 +114,16 @@ export function LandingPage() {
           </p>
 
           <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
-            <Link href="/dashboard">
+            <Link href="/auth/signup">
               <Button size="lg">
                 Get Started <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <Button variant="outline" size="lg">
-              Watch Demo
-            </Button>
+            <Link href="/auth/login">
+              <Button variant="outline" size="lg">
+                Sign In <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -187,7 +189,7 @@ export function LandingPage() {
                 <p className="mb-4 text-sm text-slate-600 dark:text-slate-400">
                   Start with a 14-day free trial. No credit card required.
                 </p>
-                <Link href="/dashboard">
+                <Link href="/auth/signup">
                   <Button className="w-full">
                     Start Free Trial <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -246,18 +248,20 @@ export function LandingPage() {
             Start your 14-day free trial today. Experience the power of intelligent project management.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
-            <Link href="/dashboard">
+            <Link href="/auth/signup">
               <Button size="lg" className="w-full sm:w-auto">
                 Get Started Now <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <Button
-              variant="outline"
-              size="lg"
-              className="w-full border-slate-700 text-white hover:bg-slate-800 sm:w-auto"
-            >
-              Schedule Demo
-            </Button>
+            <Link href="/auth/login">
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full border-slate-700 text-white hover:bg-slate-800 sm:w-auto"
+              >
+                Sign In
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

@@ -3,6 +3,9 @@ from datetime import datetime
 from app.database import db_service
 from app.auth import auth_service
 import uuid
+import logging
+
+logger = logging.getLogger(__name__)
 
 class TaskService:
     def __init__(self):
@@ -61,7 +64,7 @@ class TaskService:
             return result.get("tasks", [])
             
         except Exception as e:
-            print(f"Error getting tasks: {e}")
+            logger.error(f"Error getting tasks: {e}")
             return []
     
     async def get_task(self, task_id: str, current_user: Dict[str, Any]) -> Optional[Dict[str, Any]]:
@@ -79,7 +82,7 @@ class TaskService:
             return None
             
         except Exception as e:
-            print(f"Error getting task {task_id}: {e}")
+            logger.error(f"Error getting task {task_id}: {e}")
             return None
     
     async def update_task(self, task_id: str, update_data: Dict[str, Any], current_user: Dict[str, Any]) -> Dict[str, Any]:
@@ -193,7 +196,7 @@ class TaskService:
             return result.get("tasks", [])
             
         except Exception as e:
-            print(f"Error getting tasks by status {status}: {e}")
+            logger.error(f"Error getting tasks by status {status}: {e}")
             return []
 
 # Global task service instance

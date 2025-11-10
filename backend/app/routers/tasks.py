@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Query
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
-from app.auth import get_current_user_dependency, require_role
+from app.auth import get_current_user_dependency, require_role, get_optional_user
 from app.tasks import task_service
 from app.performance import monitor_performance
 
@@ -28,7 +28,7 @@ class TaskResponse(BaseModel):
     description: str
     status: str
     acceptance_criteria: str
-    assignee_id: str
+    assignee_id: Optional[str] = None
     created_at: int
     updated_at: int
 
@@ -39,7 +39,7 @@ class TaskListResponse(BaseModel):
 @monitor_performance
 async def create_task(
     task_data: TaskCreate,
-    current_user: Dict[str, Any] = Depends(get_current_user_dependency)
+    current_user: Dict[str, Any] = Depends(get_optional_user)
 ):
     """Create a new task"""
     try:
@@ -65,7 +65,7 @@ async def create_task(
 @monitor_performance
 async def get_tasks(
     project_id: Optional[str] = Query(None, description="Filter by project ID"),
-    current_user: Dict[str, Any] = Depends(get_current_user_dependency)
+    current_user: Dict[str, Any] = Depends(get_optional_user)
 ):
     """Get all tasks, optionally filtered by project"""
     try:
@@ -82,7 +82,7 @@ async def get_tasks(
 @monitor_performance
 async def get_task(
     task_id: str,
-    current_user: Dict[str, Any] = Depends(get_current_user_dependency)
+    current_user: Dict[str, Any] = Depends(get_optional_user)
 ):
     """Get a specific task by ID"""
     try:
@@ -109,7 +109,7 @@ async def get_task(
 async def update_task(
     task_id: str,
     task_data: TaskUpdate,
-    current_user: Dict[str, Any] = Depends(get_current_user_dependency)
+    current_user: Dict[str, Any] = Depends(get_optional_user)
 ):
     """Update a task"""
     try:

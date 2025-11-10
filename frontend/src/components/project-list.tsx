@@ -24,6 +24,8 @@ interface ProjectListProps {
   projects: Project[];
   onCreateProject: () => void;
   onSelectProject: (projectId: string) => void;
+  onEditProject?: (projectId: string) => void;
+  onDeleteProject?: (projectId: string) => void;
   isLoading?: boolean;
 }
 
@@ -31,6 +33,8 @@ export function ProjectList({
   projects,
   onCreateProject,
   onSelectProject,
+  onEditProject,
+  onDeleteProject,
   isLoading = false,
 }: ProjectListProps) {
   const formatDate = (timestamp: number) => {
@@ -123,8 +127,20 @@ export function ProjectList({
                         <DropdownMenuItem onClick={() => onSelectProject(project.id)}>
                           View board
                         </DropdownMenuItem>
+                        {onEditProject && (
+                          <DropdownMenuItem onClick={() => onEditProject(project.id)}>
+                            Edit project
+                          </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem>Share project</DropdownMenuItem>
-                        <DropdownMenuItem>Archive</DropdownMenuItem>
+                        {onDeleteProject && (
+                          <DropdownMenuItem
+                            onClick={() => onDeleteProject(project.id)}
+                            className="text-red-600"
+                          >
+                            Delete project
+                          </DropdownMenuItem>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
