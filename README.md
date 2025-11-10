@@ -1,6 +1,6 @@
-# Task Board - Real-time Collaborative Sprint Management
+# BuilderHub - AI-Powered Project Management for Development Teams
 
-AI-powered task board for team collaboration and sprint management with real-time synchronization.
+AI-powered task board and project management system for team collaboration and sprint management with real-time synchronization.
 
 ## Features
 
@@ -8,11 +8,12 @@ AI-powered task board for team collaboration and sprint management with real-tim
 - **AI Integration**: Automatically generate acceptance criteria with Gemini API
 - **Role-based Access**: Secure permissions for developers, managers, and QA teams
 - **High Performance**: Sub-500ms response times for all operations
+- **Modern UI**: Professional design with dark mode support using Shadcn/ui components
 - **Modern Stack**: Next.js, FastAPI, InstantDB, and Tailwind CSS
 
 ## Tech Stack
 
-- **Frontend**: Next.js 14, React 18, TypeScript, Tailwind CSS
+- **Frontend**: Next.js 15, React 18, TypeScript, Tailwind CSS, Shadcn/ui
 - **Backend**: FastAPI, Python
 - **Database/Auth**: InstantDB
 - **AI**: Gemini 2.5 Flash/Pro APIs
