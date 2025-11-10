@@ -1,0 +1,20 @@
+{
+  "name": "task-board-app",
+  "version": "1.0.0",
+  "description": "Real-time collaborative task board with AI integration",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && uvicorn main:app --reload --host 0.0.0.0 --port 8000",
+    "build": "npm run build:frontend && npm run build:backend",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && echo 'Backend build completed'",
+    "start": "npm run start:frontend",
+    "start:frontend": "cd frontend && npm start",
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && pip install -r requirements.txt",
+    "clean": "rd /s /q node_modules 2>nul || echo. && rd /s /q frontend\\node_modules 2>nul || echo. && rd /s /q backend\\__pycache__ 2>nul || echo. && npm run install:all"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
